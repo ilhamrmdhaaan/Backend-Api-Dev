@@ -1,0 +1,38 @@
+const getToken = headers => {
+
+    if (headers && headers.token) {
+    console.log("token header", headers);
+
+        return headers.token
+    }
+    return false
+}
+
+const verifyToken = (req, res, next) => {
+    const token = getToken(req,headers)
+    console.log("token header", token);
+    const originalUrl = req.originalUrl
+
+    if (!endPoint.endpointWithoutAuth.includes(originalUrl)) {
+        if (token) {
+            jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+                console.log("logging jwt verify token :", decoded);
+                if (err) {
+                    res.send({
+                        status : false,
+                        reason : "Expired token",
+                        code : 403,
+                    })
+                } else {
+                    req.user = {
+                        userId : helpers.hex2bin(decoded.sub.id),
+                        email : helpers.hex2bin(decoded.sub.email)
+                    }
+                }
+            })
+        }
+    }
+
+    res.append("Set-Cookie", "HttpOnly;Secure;SameSite=Strict")
+    next();
+}
