@@ -9,6 +9,18 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
+      user_id: {
+        allowNull: true,
+        type: Sequelize.INTEGER,
+        onUpdate: 'CASCADE',
+        onDelete: 'RESTRICT',
+        references: {
+          model:{
+            tableName : 'Users'
+          },
+          key: 'id'
+        }
+      },
       ip_address: {
         type: Sequelize.STRING
       },
@@ -33,18 +45,18 @@ module.exports = {
   async down(queryInterface, Sequelize) {
     await queryInterface.dropTable('Histories');
 
-    // const options =  { raw: true, transaction: t};
+    const options =  { raw: true};
 
     try {
 
       //disable foreign key check
-      // await queryInterface.sequelize.query('SET FOREIGN_KEY_CHECKS = 0', null, options);
+      await queryInterface.sequelize.query('SET FOREIGN_KEY_CHECKS = 0', null, options);
 
       //drop table
       await queryInterface.dropTable('Histories');
 
       //enable foreign key check after dropping table
-      // await queryInterface.sequelize.query('SET FOREIGN_KEY_CHECKS = 1', null, options);
+      await queryInterface.sequelize.query('SET FOREIGN_KEY_CHECKS = 1', null, options);
 
       // If the execution reaches this line, no errors were thrown.
       // We commit the transaction.

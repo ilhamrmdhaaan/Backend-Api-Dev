@@ -36,3 +36,44 @@ const verifyToken = (req, res, next) => {
     res.append("Set-Cookie", "HttpOnly;Secure;SameSite=Strict")
     next();
 }
+
+// Insert data ke tabel histories
+const insertV2 = async param => {
+    // Prepare transactions
+    const t = await sequelize.transaction()
+    const options = { transaction : t }
+
+
+try {
+    
+    let dataHistories = param.data;
+    // Use forEach to insert each data entry into the History table
+    const insertedHistories = [];
+
+    if (dataHistories.length > 0) {
+        
+        (dataHistories.map(async (data) => {
+        const { ip_address, latitude, longitude } = data;
+        const newHistory = await History.create({
+            ip_address,
+            latitude,
+            longitude
+        });
+        insertedHistories.push(newHistory);
+        }), options);
+    }
+    await t.commit()
+        
+    // console.log("log insert v2");
+
+
+} catch (e) {
+
+    // console.log("log error", e);
+
+    await t.rollback();
+
+    return e
+}
+
+}

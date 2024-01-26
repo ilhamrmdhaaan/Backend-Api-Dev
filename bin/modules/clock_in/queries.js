@@ -29,11 +29,10 @@ const insertV1 = async param => {
 }
 
 // Insert data ke tabel histories
-const insertV2 = async param => {
-        // Prepare transactions
-        const t = await sequelize.transaction()
-        const options = { transaction : t }
+const insertV2 = async (param, getUser) => {
 
+    let user_id = getUser;
+    // console.log("get user id queries", user_id);
     
     try {
         
@@ -46,23 +45,24 @@ const insertV2 = async param => {
             (dataHistories.map(async (data) => {
             const { ip_address, latitude, longitude } = data;
             const newHistory = await History.create({
+                user_id,
                 ip_address,
                 latitude,
                 longitude
+            
             });
             insertedHistories.push(newHistory);
-            }), options);
-        }
-        await t.commit()
+
+            // console.log("log insert v2", newHistory);
             
-        // console.log("log insert v2");
+            }));
+        } 
 
 
     } catch (e) {
 
         // console.log("log error", e);
 
-        await t.rollback();
 
         return e
     }

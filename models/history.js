@@ -11,9 +11,19 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      this.belongsTo(models.User, {as: 'user'});
+
     }
   }
   History.init({
+    user_id: {
+      allowNull: true,
+      type: DataTypes.INTEGER,
+      references: {
+        model: 'User',
+        key: 'id'
+      }
+    },
     ip_address: DataTypes.STRING,
     latitude: DataTypes.STRING,
     longitude: DataTypes.STRING

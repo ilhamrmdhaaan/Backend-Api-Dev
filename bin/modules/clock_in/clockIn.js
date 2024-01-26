@@ -6,7 +6,8 @@ const jwt = require('jsonwebtoken');
 const verifyToken = require('../../helpers/verify_token').verifyToken;
 
 
-router.post('/clock-in', verifyToken, async (req, res) => {    
+router.post('/clock-in', verifyToken, async (req, res) => {
+    const tokenSplit = req.headers.token;    
     let clockIn = req.body.jam;
     let dateIn = req.body.tanggal;
     let data  = req. body.data;
@@ -32,8 +33,10 @@ router.post('/clock-in', verifyToken, async (req, res) => {
     } else {
         
             try {
-                
-                let data = await domain.storeClockIn(req.body)
+                const decoded = jwt.verify(tokenSplit, process.env.JWT_SECRET)
+                const subToken = decoded.sub;
+
+                let data = await domain.storeClockIn(req.body, subToken)
         
                 res.send({
                     status : true,
